@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.Title}} · Stash TV</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+video{width:100%;height:100%;display:block;background:#000}
+a.back{position:fixed;top:1rem;left:1rem;z-index:2;color:#fff;font:20px system-ui,sans-serif;background:rgba(0,0,0,.6);padding:.4rem .9rem;border-radius:.4rem;text-decoration:none;opacity:0}
+a.back:focus{opacity:1;outline:4px solid #f5c542}
+</style>
+</head>
+<body>
+<a class="back" href="{{.Prefix}}/tv/scene/{{.SceneID}}">‹ Back</a>
+<video id="v" controls autoplay autofocus playsinline preload="auto" poster="{{.Prefix}}/scene/{{.SceneID}}/screenshot"><source src="{{.Src}}"{{with .Mime}} type="{{.}}"{{end}}></video>
+<script>
+/* Saves resume position and play count. Optional: playback works without it. */
+(function () {
+  var v = document.getElementById("v"), id = "{{.SceneID}}", off = {{.Offset}};
+  var gql = "{{.Prefix}}/graphql", counted = false, watched = 0, last = null, saved = new Date().getTime();
+  function post(query, vars) {
+    try {
+      var x = new XMLHttpRequest();
+      x.open("POST", gql, true);
+      x.setRequestHeader("Content-Type", "application/json");
+      x.send(JSON.stringify({ query: query, variables: vars }));
+    } catch (e) {}
+  }
+  function save(pos) {
+    post("mutation($id:ID!,$t:Float,$d:Float){sceneSaveActivity(id:$id,resume_time:$t,playDuration:$d)}",
+      { id: id, t: pos, d: watched });
+    watched = 0;
+    saved = new Date().getTime();
+  }
+  v.addEventListener("timeupdate", function () {
+    var t = v.currentTime;
+    if (last !== null && t > last && t - last < 2) watched += t - last;
+    last = t;
+    if (!counted && watched > 10) {
+      counted = true;
+      post("mutation($id:ID!){sceneAddPlay(id:$id){count}}", { id: id });
+    }
+    if (new Date().getTime() - saved > 15000) save(off + t);
+  });
+  v.addEventListener("seeking", function () { last = null; });
+  v.addEventListener("pause", function () { save(off + v.currentTime); });
+  v.addEventListener("ended", function () { save(0); });
+  window.addEventListener("pagehide", function () { if (!v.ended) save(off + v.currentTime); });
+})();
+</script>
+<script>
+/* Remote control from the main Stash UI: reports position and obeys commands. */
+(function () {
+  var v = document.getElementById("v"), id = {{.SceneID}}, off = {{.Offset}};
+  var prefix = "{{.Prefix}}", stream = {{.Stream}}, seekable = {{.Seekable}}, reported = 0, restarting = false;
+  function report(gone) {
+    try {
+      var x = new XMLHttpRequest();
+      x.open("POST", prefix + "/tv/cast/status", true);
+      x.setRequestHeader("Content-Type", "application/json");
+      x.send(JSON.stringify(gone ? { scene_id: 0 } : { scene_id: id, time: off + v.currentTime, paused: v.paused }));
+    } catch (e) {}
+    reported = new Date().getTime();
+  }
+  v.addEventListener("playing", function () { report(); });
+  v.addEventListener("pause", function () { report(); });
+  v.addEventListener("seeked", function () { report(); });
+  v.addEventListener("timeupdate", function () { if (new Date().getTime() - reported > 5000) report(); });
+  v.addEventListener("ended", function () { report(true); });
+  window.addEventListener("pagehide", function () { if (!restarting) report(true); });
+  setInterval(function () { if (v.paused && new Date().getTime() - reported > 5000) report(); }, 5000);
+  window.tvCastControl = function (c) {
+    if (c.action === "pause") v.pause();
+    else if (c.action === "resume") { var p = v.play(); if (p && p["catch"]) p["catch"](function () {}); }
+    else if (c.action === "stop") { v.pause(); window.location.href = prefix + "/tv/scene/" + id; }
+    else if (c.action === "seek") {
+      if (seekable) v.currentTime = c.time;
+      else { restarting = true; window.location.replace(prefix + "/tv/scene/" + id + "/play?s=" + stream + "&t=" + Math.floor(c.time)); }
+    }
+  };
+})();
+</script>
+{{template "castListener" .}}
+</body>
+</html>

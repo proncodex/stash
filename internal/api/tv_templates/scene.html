@@ -1,0 +1,39 @@
+{{template "head" .}}
+{{$p := .Prefix}}
+{{with .Scene}}
+<div class="scene">
+<div class="cover"><img src="{{$p}}/scene/{{.ID}}/screenshot" alt=""></div>
+<div class="info">
+<h1>{{.Title}}</h1>
+<div class="meta">
+{{with .Date}}{{.}} · {{end}}{{with duration .Duration}}{{.}} · {{end}}{{with .Resolution}}{{.}}{{end}}
+{{with .Rating}} · ★ {{.}}{{end}}{{if .PlayCount}} · played {{.PlayCount}}×{{end}}
+</div>
+{{if .Streams}}
+<div class="actions">
+{{if gt .Resume 0.0}}
+<a class="btn big" autofocus href="{{$p}}/tv/scene/{{.ID}}/play?t={{printf "%.0f" .Resume}}">▶ Resume from {{duration .Resume}}</a>
+<a class="btn big alt" href="{{$p}}/tv/scene/{{.ID}}/play">Play from start</a>
+{{else}}
+<a class="btn big" autofocus href="{{$p}}/tv/scene/{{.ID}}/play">▶ Play</a>
+{{end}}
+</div>
+{{else}}
+<p class="empty">No playable stream.</p>
+{{end}}
+{{with .Studio}}<p>Studio: <a class="chip" href="{{.URL}}">{{.Label}}</a></p>{{end}}
+{{if .Performers}}<div class="chips">{{range .Performers}}<a class="chip" href="{{.URL}}">{{.Label}}</a>{{end}}</div>{{end}}
+{{if .Tags}}<div class="chips">{{range .Tags}}<a class="chip" href="{{.URL}}">#{{.Label}}</a>{{end}}</div>{{end}}
+{{if gt (len .Streams) 1}}
+<details>
+<summary>Other formats (use if playback fails)</summary>
+<div class="chips">
+{{$s := .}}{{range .Streams}}<a class="chip" href="{{$p}}/tv/scene/{{$s.ID}}/play?s={{.Index}}{{if gt $s.Resume 0.0}}&amp;t={{printf "%.0f" $s.Resume}}{{end}}">{{.Label}}</a>{{end}}
+</div>
+</details>
+{{end}}
+{{with .Details}}<p class="details">{{.}}</p>{{end}}
+</div>
+</div>
+{{end}}
+{{template "foot" .}}

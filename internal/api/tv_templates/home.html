@@ -1,0 +1,11 @@
+{{template "head" .}}
+{{$p := .Prefix}}
+{{range .Rows}}
+<h2>{{.Title}} <a href="{{.More}}">See all ›</a></h2>
+<div class="row">
+{{range .Scenes}}{{template "sceneCard" (card $p .)}}{{end}}
+</div>
+{{else}}
+<p class="empty">No scenes yet.</p>
+{{end}}
+{{template "foot" .}}

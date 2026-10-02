@@ -83,9 +83,11 @@
     "next_action": "Next",
     "not_running": "not running",
     "open_in_external_player": "Open in external player",
+    "cast_to_tv": "Cast to TV",
     "open_random": "Open Random",
     "optimise_database": "Optimise database",
     "overwrite": "Overwrite",
+    "pause": "Pause",
     "play": "Play",
     "play_random": "Play Random",
     "play_selected": "Play selected",
@@ -1708,7 +1710,13 @@
   "time": "Time",
   "time_end": "End Time",
   "title": "Title",
+  "tv_remote": {
+    "cast_this_scene": "Cast this scene",
+    "nothing_playing": "Nothing is playing on the TV. Open {url} in the TV's browser, then cast a scene.",
+    "now_playing": "Playing on TV"
+  },
   "toast": {
+    "cast_to_tv": "Sent to TV",
     "added_entity": "Added {count, plural, one {{singularEntity}} other {{pluralEntity}}}",
     "added_generation_job_to_queue": "Added generation job to queue",
     "clipboard_access_denied": "Clipboard access denied. Check your browser permissions",

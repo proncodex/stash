@@ -1,0 +1,11 @@
+{{template "head" .}}
+{{$p := .Prefix}}
+<h1>{{.Title}} <small style="opacity:.6;font-weight:400">({{.Pager.Total}})</small></h1>
+<div class="chips">
+{{range .Sorts}}<a class="chip{{if .Active}} on{{end}}" href="{{.URL}}">{{.Label}}</a>{{end}}
+</div>
+<div class="grid">
+{{range .Scenes}}{{template "sceneCard" (card $p .)}}{{else}}<p class="empty">No scenes found.</p>{{end}}
+</div>
+{{template "pager" .Pager}}
+{{template "foot" .}}

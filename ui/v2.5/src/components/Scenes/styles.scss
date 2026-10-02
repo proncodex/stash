@@ -1006,3 +1006,33 @@ input[type="range"].blue-slider {
     }
   }
 }
+
+.cast-to-tv-popover {
+  max-width: min(22rem, 95vw);
+  width: 22rem;
+
+  // the default thumb colour matches the popover background
+  .cast-seek {
+    display: block;
+    width: 100%;
+
+    &::-webkit-slider-thumb {
+      background: #fff;
+      height: 20px;
+      margin-top: -7px;
+      width: 20px;
+    }
+
+    &::-moz-range-thumb {
+      background: #fff;
+      height: 20px;
+      width: 20px;
+    }
+  }
+
+  .btn-group .btn {
+    flex: 1 1 0;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+}

@@ -1,0 +1,19 @@
+{{template "head" .}}
+<h1>{{.Title}} <small style="opacity:.6;font-weight:400">({{.Pager.Total}})</small></h1>
+<div class="chips">
+{{range .Sorts}}<a class="chip{{if .Active}} on{{end}}" href="{{.URL}}">{{.Label}}</a>{{end}}
+<form method="get" action="{{.Action}}" style="display:flex;gap:.5rem;margin-left:auto">
+<input type="search" name="q" value="{{.Query}}" placeholder="Filter {{.Title}}">
+<button type="submit">Go</button>
+</form>
+</div>
+<div class="grid">
+{{range .Items}}
+<a class="card{{if eq $.Nav "performers"}} tall{{end}}" href="{{.Link}}">
+<div class="thumb"><img loading="lazy" src="{{.Image}}" alt="" style="{{if ne $.Nav "performers"}}object-fit:contain{{end}}"></div>
+<div class="name">{{.Name}}</div>
+</a>
+{{else}}<p class="empty">Nothing found.</p>{{end}}
+</div>
+{{template "pager" .Pager}}
+{{template "foot" .}}

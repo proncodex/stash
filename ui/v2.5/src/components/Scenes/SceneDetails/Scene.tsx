@@ -73,6 +73,7 @@ const GalleryViewer = lazyComponent(
 const ExternalPlayerButton = lazyComponent(
   () => import("./ExternalPlayerButton")
 );
+const CastToTVButton = lazyComponent(() => import("./CastToTVButton"));
 
 const QueueViewer = lazyComponent(() => import("./QueueViewer"));
 const SceneMarkersPanel = lazyComponent(() => import("./SceneMarkersPanel"));
@@ -731,6 +732,9 @@ const ScenePage: React.FC<IProps> = PatchComponent("ScenePage", (props) => {
             <span className="scene-toolbar-group">
               <span>
                 <ExternalPlayerButton scene={scene} />
+              </span>
+              <span>
+                <CastToTVButton scene={scene} />
               </span>
               <span>
                 <ViewCountButton

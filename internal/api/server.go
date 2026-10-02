@@ -221,6 +221,7 @@ func Initialize() (*Server, error) {
 	r.Mount("/tag", server.getTagRoutes())
 	r.Mount("/downloads", server.getDownloadsRoutes())
 	r.Mount("/plugin", server.getPluginRoutes())
+	r.Mount("/tv", server.getTVRoutes())
 
 	r.HandleFunc("/css", cssHandler(cfg))
 	r.HandleFunc("/javascript", javascriptHandler(cfg))
@@ -353,6 +354,15 @@ func (s *Server) getPerformerRoutes() chi.Router {
 		routes:          routes{txnManager: repo.TxnManager},
 		performerFinder: repo.Performer,
 		sfwConfig:       s.manager.Config,
+	}.Routes()
+}
+
+func (s *Server) getTVRoutes() chi.Router {
+	repo := s.manager.Repository
+	return tvRoutes{
+		routes:     routes{txnManager: repo.TxnManager},
+		repository: repo,
+		config:     s.manager.Config,
 	}.Routes()
 }
 
