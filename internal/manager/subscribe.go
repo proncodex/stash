@@ -39,6 +39,14 @@ func (m *subscriptionManager) notify() {
 	defer m.mutex.Unlock()
 
 	for _, s := range m.subscriptions {
-		s <- true
+		// Don't block if a subscriber isn't reading: notify is called while
+		// holding the mutex at the end of every scan/clean job, so one stalled
+		// subscriber would otherwise hang the job (and the job queue) forever
+		// once its buffer is full. A full buffer already has a pending
+		// notification, so dropping this one loses nothing.
+		select {
+		case s <- true:
+		default:
+		}
 	}
 }
