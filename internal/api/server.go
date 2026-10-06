@@ -226,6 +226,13 @@ func Initialize() (*Server, error) {
 	r.HandleFunc("/javascript", javascriptHandler(cfg))
 	r.HandleFunc("/customlocales", customLocalesHandler(cfg))
 
+	// /tv: short address for the Stash TV plugin's remote-friendly UI.
+	tvHandler := func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, getProxyPrefix(r)+"/plugin/stash_tv/assets/index.html", http.StatusFound)
+	}
+	r.HandleFunc("/tv", tvHandler)
+	r.HandleFunc("/tv/", tvHandler)
+
 	staticLoginUI := statigz.FileServer(ui.LoginUIBox.(fs.ReadDirFS))
 
 	r.Get(loginEndpoint, handleLogin())
